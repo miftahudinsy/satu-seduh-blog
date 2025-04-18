@@ -13,6 +13,12 @@ import {
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
 import React from "react";
 
+// --- Define Props Type Explicitly ---
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
 // --- Define Entry Skeleton (including all fields needed for detail page) ---
 type PostSkeleton = EntrySkeletonType<{
   judul: "Symbol";
@@ -167,8 +173,8 @@ const richTextOptions = (links: Record<string, any> | undefined): Options => ({
 });
 
 // --- Page Component (Server Component) ---
-async function PostPage({ params }: { params: { slug: string } }) {
-  const slug = params.slug;
+async function PostPage({ params }: Props) {
+  const slug = (await params).slug;
 
   if (!client) {
     return (
@@ -215,23 +221,17 @@ async function PostPage({ params }: { params: { slug: string } }) {
 
     return (
       <article className="max-w-3xl mx-auto px-4 py-8 pt-28 sm:px-6 lg:px-8">
-        {" "}
-        {/* Added padding-top */}
-        {/* Category Badge (Optional) */}
         {kategori && (
           <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold mb-4 px-2.5 py-0.5 rounded">
             {kategori}
           </span>
         )}
-        {/* Title */}
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
           {judul || "Tanpa Judul"}
         </h1>
-        {/* Date */}
         <p className="text-base text-gray-500 mb-6">
           Dipublikasikan pada {formatDate(createdAt)}
         </p>
-        {/* Cover Image */}
         {imageUrl && imageWidth && imageHeight ? (
           <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg">
             <Image
@@ -245,17 +245,13 @@ async function PostPage({ params }: { params: { slug: string } }) {
         ) : (
           <div className="h-16"></div> // Add some space if no image
         )}
-        {/* Rich Text Content */}
         <div className="prose prose-lg max-w-none prose-blue prose-img:rounded-lg prose-img:mx-auto">
-          {" "}
-          {/* Basic prose styling */}
           {content ? (
             documentToReactComponents(content, richTextOptions(links))
           ) : (
             <p>Konten tidak tersedia.</p>
           )}
         </div>
-        {/* Add other sections like related posts or comments here if needed */}
       </article>
     );
   } catch (error) {
