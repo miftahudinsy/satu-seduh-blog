@@ -74,10 +74,17 @@ export const Kategori: React.FC<KategoriProps> = ({
 
         // Set state with "Semua" first, then sorted unique categories
         setCategories(["Semua", ...Array.from(uniqueCategories).sort()]);
-      } catch (err: any) {
-        console.error("Error fetching categories from Contentful:", err);
-        setError("Gagal memuat kategori.");
-        setCategories(["Semua"]); // Provide default if fetch fails
+      } catch (err: unknown) {
+        console.error("Error fetching categories:", err);
+        let msg = "Gagal memuat kategori.";
+        // Tambahkan type guard jika perlu akses properti error
+        if (err instanceof Error) {
+          msg = `Gagal memuat kategori: ${err.message}`;
+        } else if (err && typeof err === "object" && "message" in err) {
+          msg = `Gagal memuat kategori: ${String((err as any).message)}`;
+        }
+        setError(msg);
+        setCategories([]); // Kosongkan kategori jika error
       } finally {
         setLoading(false);
       }

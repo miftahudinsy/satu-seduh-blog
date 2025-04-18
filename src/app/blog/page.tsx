@@ -1,7 +1,6 @@
 import {
   createClient,
   Entry,
-  Asset,
   EntrySkeletonType,
   ContentfulClientApi,
 } from "contentful";
@@ -71,12 +70,21 @@ async function BlogPage() {
       }
     });
     categories = Array.from(categorySet).sort(); // Urutkan kategori
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching posts for blog page:", err);
     // Berikan pesan error yang lebih spesifik jika memungkinkan
-    if (err?.sys?.id === "AccessTokenInvalid") {
+    if (
+      err &&
+      typeof err === "object" &&
+      "sys" in err &&
+      typeof (err as any).sys === "object" &&
+      (err as any).sys?.id === "AccessTokenInvalid"
+    ) {
       error = "Error Autentikasi Contentful. Periksa Access Token.";
-    } else if (err?.message?.includes("connect ECONNREFUSED")) {
+    } else if (
+      err instanceof Error &&
+      err.message?.includes("connect ECONNREFUSED")
+    ) {
       error =
         "Tidak dapat terhubung ke Contentful. Periksa koneksi internet atau status Contentful.";
     } else {

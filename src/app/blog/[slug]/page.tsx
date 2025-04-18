@@ -10,12 +10,7 @@ import {
   documentToReactComponents,
   Options,
 } from "@contentful/rich-text-react-renderer";
-import {
-  BLOCKS,
-  INLINES,
-  MARKS,
-  Document as RichTextDocument,
-} from "@contentful/rich-text-types";
+import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
 import React from "react";
 
 // --- Define Entry Skeleton (including all fields needed for detail page) ---
@@ -65,7 +60,7 @@ const formatDate = (dateString: string | undefined): string => {
 
 // --- Rich Text Rendering Options ---
 // Customize how different elements in Rich Text are rendered
-const richTextOptions = (links: any): Options => ({
+const richTextOptions = (links: Record<string, any> | undefined): Options => ({
   renderMark: {
     [MARKS.BOLD]: (text) => <strong className="font-bold">{text}</strong>,
     [MARKS.ITALIC]: (text) => <em className="italic">{text}</em>,

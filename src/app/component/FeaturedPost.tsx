@@ -92,30 +92,38 @@ export const FeaturedPost = () => {
             (item): item is Entry<PostSkeleton, undefined, string> => !!item
           )
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching Contentful data:", err);
         let errorMessage = "Gagal memuat postingan.";
-        if (
-          err?.sys?.id === "InvalidQuery" ||
-          err?.message?.includes("InvalidQuery")
-        ) {
-          errorMessage =
-            "Gagal memuat postingan: Query tidak valid. Periksa ID field (mis. 'sys.createdAt', 'fields.slug') atau ID Content Type ('blog').";
-        } else if (
-          err?.sys?.id === "AccessTokenInvalid" ||
-          err?.message?.includes("401")
-        ) {
-          errorMessage =
-            "Gagal memuat postingan: Masalah autentikasi. Periksa Space ID dan Access Token.";
-        } else if (
-          err?.sys?.id === "NotFound" ||
-          err?.message?.includes("NotFound")
-        ) {
-          errorMessage =
-            "Gagal memuat postingan: Resource tidak ditemukan (mis. ID Content Type 'blog' salah?).";
-        } else if (err instanceof Error) {
-          errorMessage = `Gagal memuat postingan: ${err.message}`;
+        if (err && typeof err === "object") {
+          const errorObj = err as any;
+          if (
+            errorObj.sys?.id === "InvalidQuery" ||
+            String(errorObj.message)?.includes("InvalidQuery")
+          ) {
+            errorMessage =
+              "Gagal memuat postingan: Query tidak valid. Periksa ID field atau ID Content Type.";
+          } else if (
+            errorObj.sys?.id === "AccessTokenInvalid" ||
+            String(errorObj.message)?.includes("401")
+          ) {
+            errorMessage =
+              "Gagal memuat postingan: Masalah autentikasi. Periksa Space ID dan Access Token.";
+          } else if (
+            errorObj.sys?.id === "NotFound" ||
+            String(errorObj.message)?.includes("NotFound")
+          ) {
+            errorMessage =
+              "Gagal memuat postingan: Resource tidak ditemukan (mis. ID Content Type salah?).";
+          } else if (errorObj.message) {
+            errorMessage = `Gagal memuat postingan: ${String(
+              errorObj.message
+            )}`;
+          }
+        } else if (typeof err === "string") {
+          errorMessage = `Gagal memuat postingan: ${err}`;
         }
+
         setError(errorMessage);
         setPosts([]); // Clear posts on error
       } finally {
