@@ -242,14 +242,3 @@ export const FeaturedPost = () => {
     </div>
   );
 };
-
-// --- Notes ---
-// 1. Environment Variables: Create a .env.local file in your project root with:
-//    NEXT_PUBLIC_CONTENTFUL_SPACE_ID=t9mzshfdsxqi
-//    NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN=LKz78VtKAm49yTTwYtLo2PTpGsjqkb-3-xdMN7cTUz8
-// 2. Content Type ID: Ensure 'blog' matches your post content type ID in Contentful.
-// 3. Field IDs: Ensure field IDs ('judul', 'slug', 'excerpt', 'coverImage', 'content', 'kategori') match your Contentful setup.
-// 4. Date Field: This component uses 'sys.createdAt' for date display and ordering. Consider adding a dedicated 'publishDate' field in Contentful for more control.
-// 5. Author Field: Author information is not displayed as the 'author' field is missing in your 'blog' content type.
-// 6. Rich Text: The 'content' field is Rich Text. This component currently doesn't render it. You'll need to install '@contentful/rich-text-react-renderer' if you want to display the full blog content elsewhere.
-// 7. Import: Remember to import and use <FeaturedPost /> in your page component (e.g., src/app/page.tsx).
