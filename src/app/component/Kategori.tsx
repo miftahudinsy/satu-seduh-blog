@@ -2,7 +2,6 @@
 
 import {
   createClient,
-  Entry,
   EntrySkeletonType,
   ContentfulClientApi,
 } from "contentful";

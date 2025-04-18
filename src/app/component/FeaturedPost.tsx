@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Document } from "@contentful/rich-text-types"; // Keep for potential RichText use
 
 // --- Define Entry Skeleton based on your 'blog' Content Type ---
 type PostSkeleton = EntrySkeletonType<{

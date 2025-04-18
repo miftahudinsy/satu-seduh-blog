@@ -1,6 +1,5 @@
 import {
   createClient,
-  Entry,
   Asset,
   EntrySkeletonType,
   ContentfulClientApi,

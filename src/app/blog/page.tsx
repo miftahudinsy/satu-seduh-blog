@@ -19,7 +19,6 @@ type PostSkeleton = EntrySkeletonType<{
 }>;
 
 // Type for the linked Asset (Image)
-type LinkedImageAsset = Asset<undefined, string>;
 
 // --- Contentful Client Initialization ---
 const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
