@@ -17,12 +17,7 @@ const Navbar = () => {
           >
             Blog
           </Link>
-          <Link
-            href="/kategori"
-            className="hover:text-blue-600 cursor-pointer transition-colors duration-200"
-          >
-            Kategori
-          </Link>
+
           <Link
             href="/tentang-kami"
             className="hover:text-blue-600 cursor-pointer transition-colors duration-200"
