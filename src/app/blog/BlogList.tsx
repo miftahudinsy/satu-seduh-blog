@@ -130,7 +130,7 @@ const BlogList: React.FC<BlogListProps> = ({
     return (
       <div
         key={post.sys.id}
-        className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-md"
+        className="bg-gray-50 rounded-lg shadow-md overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
       >
         {imageUrl && imageWidth && imageHeight ? (
           <Link href={`/blog/${slug}`} className="block relative h-48 w-full">
@@ -171,91 +171,93 @@ const BlogList: React.FC<BlogListProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 pt-28 sm:px-6 lg:px-8">
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
-        Semua Postingan
-      </h1>
+    <div className="bg-white mb-9 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto pt-28 ">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
+          Semua Postingan
+        </h1>
 
-      {/* Category Filters */}
-      <div className="flex flex-wrap justify-center gap-2 mb-6">
-        <button
-          onClick={() => handleCategoryClick(null)}
-          className={`px-4 py-2 text-sm rounded-full border transition-colors duration-200 ${
-            selectedCategory === null
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-          }`}
-        >
-          Semua
-        </button>
-        {allCategories.map((category) => (
+        {/* Category Filters */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
           <button
-            key={category}
-            onClick={() => handleCategoryClick(category)}
+            onClick={() => handleCategoryClick(null)}
             className={`px-4 py-2 text-sm rounded-full border transition-colors duration-200 ${
-              selectedCategory === category
+              selectedCategory === null
                 ? "bg-blue-600 text-white border-blue-600"
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
             }`}
           >
-            {category}
+            Semua
           </button>
-        ))}
-      </div>
-
-      {/* Search Bar */}
-      <div className="mb-8 max-w-md mx-auto">
-        <input
-          type="text"
-          placeholder="Cari postingan..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
-
-      {/* Display Fetch Error */}
-      {fetchError && (
-        <p className="text-center text-red-600 bg-red-100 p-4 rounded border border-red-300 mb-8">
-          {fetchError}
-        </p>
-      )}
-
-      {/* Post Grid */}
-      {!fetchError && filteredPosts.length === 0 && (
-        <p className="text-center text-gray-500 py-8">
-          Tidak ada postingan yang cocok.
-        </p>
-      )}
-
-      {!fetchError && filteredPosts.length > 0 && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          {paginatedPosts.map(renderPostCard).filter(Boolean)}
+          {allCategories.map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryClick(category)}
+              className={`px-4 py-2 text-sm rounded-full border transition-colors duration-200 ${
+                selectedCategory === category
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Pagination */}
-      {!fetchError && totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-4 mt-10">
-          <button
-            onClick={goToPreviousPage}
-            disabled={currentPage === 1}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            &laquo; Sebelumnya
-          </button>
-          <span className="text-sm text-gray-700">
-            Halaman {currentPage} dari {totalPages}
-          </span>
-          <button
-            onClick={goToNextPage}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Berikutnya &raquo;
-          </button>
+        {/* Search Bar */}
+        <div className="mb-8 max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Cari postingan..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
-      )}
+
+        {/* Display Fetch Error */}
+        {fetchError && (
+          <p className="text-center text-red-600 bg-red-100 p-4 rounded border border-red-300 mb-8">
+            {fetchError}
+          </p>
+        )}
+
+        {/* Post Grid */}
+        {!fetchError && filteredPosts.length === 0 && (
+          <p className="text-center text-gray-500 py-8">
+            Tidak ada postingan yang cocok.
+          </p>
+        )}
+
+        {!fetchError && filteredPosts.length > 0 && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            {paginatedPosts.map(renderPostCard).filter(Boolean)}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!fetchError && totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-4 mt-10">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              &laquo; Sebelumnya
+            </button>
+            <span className="text-sm text-gray-700">
+              Halaman {currentPage} dari {totalPages}
+            </span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Berikutnya &raquo;
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
