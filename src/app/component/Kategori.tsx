@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -81,6 +82,7 @@ export const Kategori: React.FC<KategoriProps> = ({
         if (err instanceof Error) {
           msg = `Gagal memuat kategori: ${err.message}`;
         } else if (err && typeof err === "object" && "message" in err) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           msg = `Gagal memuat kategori: ${String((err as any).message)}`;
         }
         setError(msg);

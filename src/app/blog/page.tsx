@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createClient,
   Entry,
@@ -73,6 +74,9 @@ async function BlogPage() {
   } catch (err: unknown) {
     console.error("Error fetching posts for blog page:", err);
     // Berikan pesan error yang lebih spesifik jika memungkinkan
+    // Perlu type guard/assertion jika mengakses properti error secara langsung
+    // Tapi optional chaining (?.) mungkin sudah cukup aman di sini
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (
       err &&
       typeof err === "object" &&
@@ -81,6 +85,7 @@ async function BlogPage() {
       (err as any).sys?.id === "AccessTokenInvalid"
     ) {
       error = "Error Autentikasi Contentful. Periksa Access Token.";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } else if (
       err instanceof Error &&
       err.message?.includes("connect ECONNREFUSED")

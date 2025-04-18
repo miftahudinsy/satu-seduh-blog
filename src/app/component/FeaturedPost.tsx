@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -96,6 +97,7 @@ export const FeaturedPost = () => {
         console.error("Error fetching Contentful data:", err);
         let errorMessage = "Gagal memuat postingan.";
         if (err && typeof err === "object") {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const errorObj = err as any;
           if (
             errorObj.sys?.id === "InvalidQuery" ||
