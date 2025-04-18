@@ -29,10 +29,8 @@ type LinkedImageAsset = Asset<undefined, string>;
 
 // --- Contentful Client ---
 // Ensure you have NEXT_PUBLIC_CONTENTFUL_SPACE_ID and NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN in your .env.local
-const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID || "t9mzshfdsxqi"; // Fallback added
-const accessToken =
-  process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN ||
-  "LKz78VtKAm49yTTwYtLo2PTpGsjqkb-3-xdMN7cTUz8"; // Fallback added
+const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
+const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
 
 if (!spaceId || !accessToken) {
   console.error(
