@@ -9,6 +9,7 @@ import {
 } from "contentful";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Document } from "@contentful/rich-text-types"; // Keep for potential RichText use
 
 // --- Define Entry Skeleton based on your 'blog' Content Type ---
@@ -73,12 +74,20 @@ export const FeaturedPost = () => {
         setLoading(true);
         setError(null); // Reset error on new fetch
 
-        // Fetch entries using the PostSkeleton
+        // Fetch entries including slug
         const response = await client.getEntries<PostSkeleton>({
           content_type: "blog", // Use your actual Content Type ID: 'blog'
           order: ["-sys.createdAt"], // Order by creation date descending (no publishDate field)
           limit: 3,
           include: 1, // Include linked assets (coverImage)
+          select: [
+            "sys.id",
+            "sys.createdAt",
+            "fields.judul",
+            "fields.slug",
+            "fields.excerpt",
+            "fields.coverImage",
+          ],
         });
 
         setPosts(
@@ -94,7 +103,7 @@ export const FeaturedPost = () => {
           err?.message?.includes("InvalidQuery")
         ) {
           errorMessage =
-            "Gagal memuat postingan: Query tidak valid. Periksa ID field (mis. 'sys.createdAt') atau ID Content Type ('blog').";
+            "Gagal memuat postingan: Query tidak valid. Periksa ID field (mis. 'sys.createdAt', 'fields.slug') atau ID Content Type ('blog').";
         } else if (
           err?.sys?.id === "AccessTokenInvalid" ||
           err?.message?.includes("401")
@@ -140,7 +149,7 @@ export const FeaturedPost = () => {
 
   // Render function for a single post card
   const renderPostCard = (post: Entry<PostSkeleton, undefined, string>) => {
-    const { judul, excerpt } = post.fields;
+    const { judul, excerpt, slug } = post.fields;
     const createdAt = post.sys.createdAt; // Use creation date
 
     // Cover Image Data
@@ -152,6 +161,11 @@ export const FeaturedPost = () => {
       coverImageAsset?.fields?.description || judul || "Gambar Kover";
     const imageWidth = coverImageAsset?.fields?.file?.details?.image?.width;
     const imageHeight = coverImageAsset?.fields?.file?.details?.image?.height;
+
+    if (!slug) {
+      console.warn(`Postingan "${judul}" tidak memiliki slug.`);
+      return null;
+    }
 
     return (
       <div
@@ -182,10 +196,12 @@ export const FeaturedPost = () => {
           <p className="text-sm text-gray-500 mb-2">
             {formatDate(createdAt)} {/* Display creation date */}
           </p>
-          <h3 className="text-xl font-semibold text-gray-800 mb-3 hover:text-blue-600 transition-colors duration-200 cursor-pointer line-clamp-2">
-            {judul || "Tanpa Judul"}
-          </h3>
-          <p className="text-gray-600 text-sm flex-grow line-clamp-3">
+          <Link href={`/blog/${slug}`} className="group">
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-200 cursor-pointer line-clamp-2">
+              {judul || "Tanpa Judul"}
+            </h3>
+          </Link>
+          <p className="text-gray-600 text-sm flex-grow line-clamp-3 mb-4">
             {excerpt || "Tidak ada deskripsi"}
           </p>
           {/* Removed Author section as it's not in the Content Type */}
@@ -199,7 +215,7 @@ export const FeaturedPost = () => {
   };
 
   return (
-    <div className="bg-white py-9 px-4 sm:px-6 lg:px-8">
+    <div className="bg-white mb-9 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-800 mb-8">
           Postingan Terbaru
@@ -221,7 +237,7 @@ export const FeaturedPost = () => {
 
         {!loading && !error && posts.length > 0 && (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map(renderPostCard)}
+            {posts.map(renderPostCard).filter(Boolean)}
           </div>
         )}
       </div>
