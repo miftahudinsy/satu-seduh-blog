@@ -55,6 +55,9 @@ const formatDate = (dateString: string | undefined): string => {
   }
 };
 
+// --- Rich Text Rendering Options ---
+// Customize how different elements in Rich Text are rendered
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const richTextOptions = (links: Record<string, any> | undefined): Options => ({
   renderMark: {
     [MARKS.BOLD]: (text) => <strong className="font-bold">{text}</strong>,

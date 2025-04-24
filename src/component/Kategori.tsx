@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -8,29 +7,18 @@ import {
 } from "contentful";
 import { useEffect, useState } from "react";
 
-// --- Define Entry Skeleton (only need 'kategori' for this component) ---
 type CategorySkeleton = EntrySkeletonType<{
   kategori: "Symbol";
-  // We only fetch the 'kategori' field
 }>;
 
-// --- Contentful Client ---
-const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID || "t9mzshfdsxqi";
-const accessToken =
-  process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN ||
-  "LKz78VtKAm49yTTwYtLo2PTpGsjqkb-3-xdMN7cTUz8";
+// --- Klien Contentful ---
+const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
+const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
 
-let client: ContentfulClientApi<undefined> | null = null;
-if (spaceId && accessToken) {
-  client = createClient({
-    space: spaceId,
-    accessToken: accessToken,
-  });
-} else {
-  console.warn(
-    "Kategori Component: Contentful client could not be initialized due to missing configuration."
-  );
-}
+const client: ContentfulClientApi<undefined> = createClient({
+  space: spaceId!,
+  accessToken: accessToken!,
+});
 
 // Props definition including potential callback for category selection
 interface KategoriProps {
@@ -43,21 +31,14 @@ export const Kategori: React.FC<KategoriProps> = ({
   selectedCategory,
 }) => {
   const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!client) {
-      setError("Konfigurasi Contentful tidak lengkap.");
-      setLoading(false);
       return;
     }
 
     const fetchCategories = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
         // Fetch all entries of type 'blog', but only select the 'kategori' field
         const response = await client.getEntries<CategorySkeleton>({
           content_type: "blog",
@@ -77,18 +58,7 @@ export const Kategori: React.FC<KategoriProps> = ({
         setCategories(["Semua", ...Array.from(uniqueCategories).sort()]);
       } catch (err: unknown) {
         console.error("Error fetching categories:", err);
-        let msg = "Gagal memuat kategori.";
-        // Tambahkan type guard jika perlu akses properti error
-        if (err instanceof Error) {
-          msg = `Gagal memuat kategori: ${err.message}`;
-        } else if (err && typeof err === "object" && "message" in err) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          msg = `Gagal memuat kategori: ${String((err as any).message)}`;
-        }
-        setError(msg);
         setCategories([]); // Kosongkan kategori jika error
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -99,18 +69,7 @@ export const Kategori: React.FC<KategoriProps> = ({
     if (onSelectCategory) {
       onSelectCategory(category);
     }
-    // Add local state management for active button if needed without callback
   };
-
-  // Basic loading and error display (can be enhanced)
-  if (loading) {
-    return (
-      <div className="text-center py-4 text-gray-500">Memuat kategori...</div>
-    );
-  }
-  if (error) {
-    return <div className="text-center py-4 text-red-600">Error: {error}</div>;
-  }
 
   return (
     <div className="mb-9 px-4 sm:px-6 lg:px-8">
@@ -142,11 +101,3 @@ export const Kategori: React.FC<KategoriProps> = ({
     </div>
   );
 };
-
-// --- Notes ---
-// 1. Filtering Logic: This component displays categories but doesn't filter posts by itself.
-//    You'll need to implement filtering in the parent component that uses <Kategori />
-//    by passing an `onSelectCategory` function and potentially a `selectedCategory` prop.
-// 2. Fetch Limit: The `limit: 1000` assumes you have fewer than 1000 blog posts.
-//    If you have more, you might need pagination to fetch all categories reliably.
-// 3. Styling: Adjust Tailwind classes as needed for your desired look.
