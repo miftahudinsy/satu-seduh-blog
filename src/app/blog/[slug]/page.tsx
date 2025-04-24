@@ -5,7 +5,6 @@ import {
   ContentfulClientApi,
 } from "contentful";
 import Image from "next/image";
-import { notFound } from "next/navigation"; // Import notFound
 import {
   documentToReactComponents,
   Options,
@@ -19,35 +18,27 @@ type Props = {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-// --- Define Entry Skeleton (including all fields needed for detail page) ---
 type PostSkeleton = EntrySkeletonType<{
-  judul: "Symbol";
-  slug: "Symbol";
-  excerpt: "Text";
-  coverImage: "Link"; // Link to an Asset
-  content: "RichText"; // Crucial for detail page
-  kategori: "Symbol";
+  judul: string;
+  slug: string;
+  excerpt: string;
+  coverImage: Asset;
+  content: Document;
+  kategori: string;
 }>;
 
-// Type for the linked Asset (Image)
 type LinkedImageAsset = Asset<undefined, string>;
 
-// --- Contentful Client Initialization (Consider moving to a shared utility file) ---
+// --- Klien Contentful ---
 const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
 const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
 
-if (!spaceId || !accessToken) {
-  throw new Error(
-    "Contentful Space ID and Access Token must be provided in environment variables for blog detail page."
-  );
-}
-
 const client: ContentfulClientApi<undefined> = createClient({
-  space: spaceId,
-  accessToken: accessToken,
+  space: spaceId!,
+  accessToken: accessToken!,
 });
 
-// --- Helper Function to Format Date ---
+// fungsi buat format tanggal
 const formatDate = (dateString: string | undefined): string => {
   if (!dateString) return "Tanggal tidak tersedia";
   const options: Intl.DateTimeFormatOptions = {
@@ -64,9 +55,6 @@ const formatDate = (dateString: string | undefined): string => {
   }
 };
 
-// --- Rich Text Rendering Options ---
-// Customize how different elements in Rich Text are rendered
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const richTextOptions = (links: Record<string, any> | undefined): Options => ({
   renderMark: {
     [MARKS.BOLD]: (text) => <strong className="font-bold">{text}</strong>,
@@ -173,17 +161,9 @@ const richTextOptions = (links: Record<string, any> | undefined): Options => ({
   },
 });
 
-// --- Page Component (Server Component) ---
+// Page Component (Server Component)
 async function PostPage({ params }: Props) {
   const slug = (await params).slug;
-
-  if (!client) {
-    return (
-      <div className="text-center py-20 text-red-600">
-        Konfigurasi Contentful tidak lengkap. Periksa environment variables.
-      </div>
-    );
-  }
 
   try {
     // Fetch the specific post by slug
@@ -195,11 +175,6 @@ async function PostPage({ params }: Props) {
     } as const;
 
     const response = await client.getEntries<PostSkeleton>(query);
-
-    if (!response.items || response.items.length === 0) {
-      // If no post found for the slug, trigger a 404 page
-      notFound();
-    }
 
     const post = response.items[0];
     const { judul, content, kategori } = post.fields;
@@ -238,44 +213,23 @@ async function PostPage({ params }: Props) {
             <Image
               src={`https:${imageUrl}`}
               alt={imageAlt}
-              fill // Use fill to cover the container
-              style={{ objectFit: "cover" }} // Ensure image covers
-              priority // Prioritize loading the main image
+              fill
+              style={{ objectFit: "cover" }}
+              priority
             />
           </div>
         ) : (
           <div className="h-16"></div> // Add some space if no image
         )}
         <div className="prose prose-lg max-w-none prose-blue prose-img:rounded-lg prose-img:mx-auto">
-          {content ? (
-            documentToReactComponents(content, richTextOptions(links))
-          ) : (
-            <p>Konten tidak tersedia.</p>
-          )}
+          {content &&
+            documentToReactComponents(content, richTextOptions(links))}
         </div>
       </article>
     );
   } catch (error) {
     console.error("Error fetching post detail:", error);
-    // You might want to render a specific error component here
-    return (
-      <div className="text-center py-20 text-red-600">
-        Terjadi kesalahan saat memuat postingan. Coba lagi nanti.
-      </div>
-    );
   }
 }
 
 export default PostPage;
-
-// --- Note on Static Generation (Optional but Recommended) ---
-// For better performance, consider using generateStaticParams
-// to pre-render blog pages at build time.
-// See: https://nextjs.org/docs/app/api-reference/functions/generate-static-params
-// Example:
-// export async function generateStaticParams() {
-//   const response = await client.getEntries<PostSkeleton>({ content_type: 'blog', select: ['fields.slug'] });
-//   return response.items.map((item) => ({
-//     slug: item.fields.slug,
-//   }));
-// }

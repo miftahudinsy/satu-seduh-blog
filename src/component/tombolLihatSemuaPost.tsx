@@ -4,12 +4,9 @@ import React from "react";
 export const TombolLihatSemuaPost = () => {
   return (
     <div className="text-center my-10">
-      {" "}
-      {/* Wrapper for centering and margin */}
       <Link
         href="/blog"
         className="
-          inline-block 
           bg-blue-600 
           text-white 
           font-semibold 
@@ -19,7 +16,6 @@ export const TombolLihatSemuaPost = () => {
           shadow-md 
           hover:bg-blue-700 
           transition-colors duration-300 
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
         "
       >
         Baca Postingan Lainnya
@@ -27,5 +23,3 @@ export const TombolLihatSemuaPost = () => {
     </div>
   );
 };
-
-// Note: Remember to import and use <TombolLihatSemuaPost /> in your desired page component.

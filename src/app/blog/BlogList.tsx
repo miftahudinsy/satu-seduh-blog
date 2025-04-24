@@ -5,14 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Entry, Asset, EntrySkeletonType } from "contentful";
 
-// --- Types (Harus sama dengan di page.tsx) ---
 type PostSkeleton = EntrySkeletonType<{
-  judul: "Symbol";
-  slug: "Symbol";
-  excerpt: "Text";
-  coverImage: "Link";
-  content: "RichText";
-  kategori: "Symbol";
+  judul: string;
+  slug: string;
+  excerpt: string;
+  coverImage: Asset;
+  content: Document;
+  kategori: string;
 }>;
 type LinkedImageAsset = Asset<undefined, string>;
 type PostEntry = Entry<PostSkeleton, undefined, string>;
@@ -25,7 +24,7 @@ interface BlogListProps {
 
 const ITEMS_PER_PAGE = 3;
 
-// --- Helper Function to Format Date ---
+// fungsi buat format tanggal
 const formatDate = (dateString: string | undefined): string => {
   if (!dateString) return "Tanggal tidak tersedia";
   const options: Intl.DateTimeFormatOptions = {
@@ -112,7 +111,7 @@ const BlogList: React.FC<BlogListProps> = ({
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
-  // --- Render Post Card (Adapted from FeaturedPost.tsx) ---
+  // --- Render Post Card  ---
   const renderPostCard = (post: PostEntry) => {
     const { judul, excerpt, slug, kategori } = post.fields;
     const createdAt = post.sys.createdAt;
@@ -125,14 +124,12 @@ const BlogList: React.FC<BlogListProps> = ({
     const imageWidth = coverImageAsset?.fields?.file?.details?.image?.width;
     const imageHeight = coverImageAsset?.fields?.file?.details?.image?.height;
 
-    if (!slug) return null; // Skip posts without slug
-
     return (
       <div
         key={post.sys.id}
         className="bg-gray-50 rounded-lg shadow-md overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
       >
-        {imageUrl && imageWidth && imageHeight ? (
+        {imageUrl && imageWidth && imageHeight && (
           <Link href={`/blog/${slug}`} className="block relative h-48 w-full">
             <Image
               src={`https:${imageUrl}`}
@@ -143,19 +140,16 @@ const BlogList: React.FC<BlogListProps> = ({
               priority={paginatedPosts.indexOf(post) < ITEMS_PER_PAGE} // Prioritize visible images
             />
           </Link>
-        ) : (
-          <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-400">
-            Tanpa Gambar
-          </div>
         )}
+
         <div className="p-5 flex flex-col flex-grow">
           <Link href={`/blog/${slug}`} className="group">
             <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">
-              {judul || "Tanpa Judul"}
+              {judul}
             </h3>
           </Link>
           <p className="text-gray-600 text-sm flex-grow line-clamp-3 mb-4">
-            {excerpt || "Tidak ada deskripsi."}
+            {excerpt}
           </p>
           <div className="mt-auto flex justify-between items-center text-xs text-gray-500">
             {kategori && (
@@ -214,20 +208,6 @@ const BlogList: React.FC<BlogListProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-
-        {/* Display Fetch Error */}
-        {fetchError && (
-          <p className="text-center text-red-600 bg-red-100 p-4 rounded border border-red-300 mb-8">
-            {fetchError}
-          </p>
-        )}
-
-        {/* Post Grid */}
-        {!fetchError && filteredPosts.length === 0 && (
-          <p className="text-center text-gray-500 py-8">
-            Tidak ada postingan yang cocok.
-          </p>
-        )}
 
         {!fetchError && filteredPosts.length > 0 && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
